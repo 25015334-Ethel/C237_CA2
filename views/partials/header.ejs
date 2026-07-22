@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Travel Planner</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <a href="/">
+                Travel Planner
+            </a>
+
+        </div>
+
+        <ul class="nav-links">
+
+            <% if(!user){ %>
+
+                <li>
+                    <a href="/">Home</a>
+                </li>
+
+                <li>
+                    <a href="/login">Login</a>
+                </li>
+
+                <li>
+                    <a href="/register">Register</a>
+                </li>
+
+            <% } else { %>
+
+                <li>
+                    <a href="/viewTrips">Dashboard</a>
+                </li>
+
+                <li>
+                    <a href="/addTravel">
+                        <%= user.role === "corporate" ? "Business Travel" : "Add Travel" %>
+                    </a>
+                </li>
+
+                <% if(user.role === "corporate"){ %>
+
+                    <li>
+                        <a href="/addGroupTrip">Group Trips</a>
+                    </li>
+
+                <% } %>
+
+                <li>
+                    <a href="/logout">Logout</a>
+                </li>
+
+            <% } %>
+
+        </ul>
+
+    </nav>
+
+</header>

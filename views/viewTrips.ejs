@@ -1,0 +1,403 @@
+<%- include("partials/header") %>
+
+<div class="container">
+
+    <% if(success.length > 0){ %>
+
+        <div class="success-message">
+            <%= success %>
+        </div>
+
+    <% } %>
+
+    <% if(error.length > 0){ %>
+
+        <div class="error-message">
+            <%= error %>
+        </div>
+
+    <% } %>
+
+    <h1 class="page-title">
+
+        <% if(user.role === "corporate"){ %>
+
+            Corporate Dashboard
+
+        <% } else { %>
+
+            My Trips
+
+        <% } %>
+
+    </h1>
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card">
+
+            <h2><%= totalTrips %></h2>
+
+            <p>
+
+                <% if(user.role === "corporate"){ %>
+
+                    Group Trips
+
+                <% } else { %>
+
+                    Total Trips
+
+                <% } %>
+
+            </p>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h2>
+
+                S$<%= Number(totalBudget).toLocaleString() %>
+
+            </h2>
+
+            <p>
+
+                Total Budget
+
+            </p>
+
+        </div>
+
+    </div>
+
+<% if(user.role !== "corporate"){ %>
+
+<form method="GET" action="/viewTrips" class="search-form">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search destination or country"
+        value="<%= search %>">
+
+    <select name="country">
+
+        <option value="">All Countries</option>
+
+        <option value="Japan" <%= country==="Japan"?"selected":"" %>>
+            Japan
+        </option>
+
+        <option value="Singapore" <%= country==="Singapore"?"selected":"" %>>
+            Singapore
+        </option>
+
+        <option value="Malaysia" <%= country==="Malaysia"?"selected":"" %>>
+            Malaysia
+        </option>
+
+        <option value="Thailand" <%= country==="Thailand"?"selected":"" %>>
+            Thailand
+        </option>
+
+    </select>
+
+    <select name="sort">
+
+        <option value="">Sort By</option>
+
+        <option value="budgetAsc" <%= sort==="budgetAsc"?"selected":"" %>>
+            Budget ↑
+        </option>
+
+        <option value="budgetDesc" <%= sort==="budgetDesc"?"selected":"" %>>
+            Budget ↓
+        </option>
+
+        <option value="dateAsc" <%= sort==="dateAsc"?"selected":"" %>>
+            Earliest Date
+        </option>
+
+        <option value="dateDesc" <%= sort==="dateDesc"?"selected":"" %>>
+            Latest Date
+        </option>
+
+    </select>
+
+    <button class="btn">
+
+        Search
+
+    </button>
+
+</form>
+
+<% } %>
+
+<% if(user.role === "corporate"){ %>
+
+<div class="recent-section">
+
+    <div class="section-header">
+
+        <h2>My Group Trips</h2>
+
+        <a href="/addGroupTrip" class="btn">
+
+            + New Group Trip
+
+        </a>
+
+    </div>
+
+    <% if(groupTrips.length === 0){ %>
+
+        <div class="empty-state">
+
+            <h3>No Group Trips Yet</h3>
+
+            <p>
+
+                Create your first group trip.
+
+            </p>
+
+        </div>
+
+    <% } else { %>
+
+        <div class="trip-grid">
+
+            <% groupTrips.forEach(trip => { %>
+
+                <div class="trip-card">
+
+                    <% if(trip.image){ %>
+
+                        <img
+                            src="/images/<%= trip.image %>"
+                            alt="<%= trip.groupName %>"
+                            class="trip-card-image">
+
+                    <% } else { %>
+
+                        <img
+                            src="/images/default.jpg"
+                            alt="No Image"
+                            class="trip-card-image">
+
+                    <% } %>
+
+                    <div class="trip-content">
+
+                        <h3>
+
+                            <%= trip.groupName %>
+
+                        </h3>
+
+                        <p>
+
+                            <strong>Destination:</strong>
+
+                            <%= trip.destination %>, <%= trip.country %>
+
+                        </p>
+
+                        <p>
+
+                            <strong>Start Date:</strong>
+
+                            <%= new Date(trip.startDate).toLocaleDateString() %>
+
+                        </p>
+
+                        <p>
+
+                            <strong>Budget:</strong>
+
+                            S$<%= Number(trip.budget).toLocaleString() %>
+
+                        </p>
+
+                        <p>
+
+                            <strong>Members:</strong>
+
+                            <%= trip.memberCount %>
+
+                        </p>
+
+                        <div class="trip-actions">
+
+                            <a
+                                href="/groupTrip/<%= trip.id %>"
+                                class="btn-small">
+
+                                View
+
+                            </a>
+
+                            <a
+                                href="/editGroupTrip/<%= trip.id %>"
+                                class="btn-small">
+
+                                Edit
+
+                            </a>
+
+                            <a
+                                href="/deleteGroupTrip/<%= trip.id %>"
+                                class="btn-small delete-btn"
+                                onclick="return confirm('Delete this group trip?')">
+
+                                Delete
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <% }) %>
+
+        </div>
+
+    <% } %>
+
+</div>
+
+<% } %>
+
+<% if(user.role !== "corporate"){ %>
+
+<div class="recent-section">
+
+    <div class="section-header">
+
+        <h2>My Trips</h2>
+
+        <a href="/addTrip" class="btn">
+
+            + Add Trip
+
+        </a>
+
+    </div>
+
+    <% if(trips.length === 0){ %>
+
+        <div class="empty-state">
+
+            <h3>No Trips Yet</h3>
+
+            <p>
+
+                Start planning your first trip.
+
+            </p>
+
+        </div>
+
+    <% } else { %>
+
+        <div class="trip-grid">
+
+            <% trips.forEach(trip => { %>
+
+                <div class="trip-card">
+
+                    <% if(trip.image){ %>
+
+                        <img
+                            src="/images/<%= trip.image %>"
+                            alt="<%= trip.destination %>"
+                            class="trip-card-image">
+
+                    <% } else { %>
+
+                        <img
+                            src="/images/default.jpg"
+                            alt="No Image"
+                            class="trip-card-image">
+
+                    <% } %>
+
+                    <div class="trip-content">
+
+                        <h3>
+
+                            <%= trip.destination %>
+
+                        </h3>
+
+                        <p>
+
+                            <%= trip.country %>
+
+                        </p>
+
+                        <p>
+
+                            <%= new Date(trip.startDate).toLocaleDateString() %>
+
+                        </p>
+
+                        <p>
+
+                            S$<%= Number(trip.budget).toLocaleString() %>
+
+                        </p>
+
+                        <div class="trip-actions">
+
+                            <a
+                                href="/trip/<%= trip.id %>"
+                                class="btn-small">
+
+                                View
+
+                            </a>
+
+                            <a
+                                href="/editTrip/<%= trip.id %>"
+                                class="btn-small">
+
+                                Edit
+
+                            </a>
+
+                            <a
+                                href="/deleteTrip/<%= trip.id %>"
+                                class="btn-small delete-btn"
+                                onclick="return confirm('Delete this trip?')">
+
+                                Delete
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <% }) %>
+
+        </div>
+
+    <% } %>
+
+</div>
+
+<% } %>
+
+</div>
+
+</body>
+
+</html>

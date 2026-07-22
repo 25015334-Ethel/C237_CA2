@@ -1,0 +1,73 @@
+<%- include("partials/header") %>
+
+<div class="container">
+
+    <% if(success.length > 0){ %>
+        <div class="success-message">
+            <%= success %>
+        </div>
+    <% } %>
+
+    <% if(error.length > 0){ %>
+        <div class="error-message">
+            <%= error %>
+        </div>
+    <% } %>
+
+    <div class="trip-details-card">
+
+        <h1><%= trip.destination %></h1>
+
+        <% if(trip.image){ %>
+            <img
+                src="/images/<%= trip.image %>"
+                alt="<%= trip.destination %>"
+                class="trip-detail-image">
+        <% } else { %>
+            <img
+                src="/images/default.jpg"
+                alt="No Image"
+                class="trip-detail-image">
+        <% } %>
+
+        <div class="trip-info">
+
+            <p><strong>Country:</strong> <%= trip.country %></p>
+
+            <p><strong>Start Date:</strong>
+                <%= new Date(trip.startDate).toLocaleDateString() %>
+            </p>
+
+            <p><strong>End Date:</strong>
+                <%= new Date(trip.endDate).toLocaleDateString() %>
+            </p>
+
+            <p><strong>Budget:</strong>
+                S$<%= Number(trip.budget).toLocaleString() %>
+            </p>
+
+            <p><strong>Notes:</strong></p>
+
+            <p>
+                <%= trip.notes || "No notes available." %>
+            </p>
+
+        </div>
+
+        <div class="trip-actions">
+            <a href="/viewTrips" class="btn">Back</a>
+            <a href="/editTrip/<%= trip.id %>" class="btn">Edit</a>
+
+            <a href="/deleteTravel/<%= trip.id %>"
+               class="btn delete-btn"
+               onclick="return confirm('Delete this trip?')">
+                Delete
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

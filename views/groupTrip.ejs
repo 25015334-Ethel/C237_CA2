@@ -1,0 +1,290 @@
+<%- include("partials/header") %>
+
+<div class="container">
+
+    <!-- Hero Banner -->
+    <div class="trip-banner"
+         style="background-image:url('/images/<%= trip.image %>')">
+
+        <div class="trip-overlay">
+
+            <span class="trip-tag">
+
+                Corporate Group Trip
+
+            </span>
+
+            <h1>
+
+                <%= trip.groupName %>
+
+            </h1>
+
+            <p>
+
+                <%= trip.destination %>, <%= trip.country %>
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Flash Messages -->
+
+    <% if(success.length > 0){ %>
+
+        <div class="success-message">
+
+            <%= success %>
+
+        </div>
+
+    <% } %>
+
+    <% if(error.length > 0){ %>
+
+        <div class="error-message">
+
+            <%= error %>
+
+        </div>
+
+    <% } %>
+
+    <!-- Dashboard Cards -->
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card">
+
+            <h2>Destination</h2>
+
+            <p>
+
+                <strong><%= trip.destination %></strong>
+
+                <br>
+
+                <%= trip.country %>
+
+            </p>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h2>Budget</h2>
+
+            <p>
+
+                <strong>
+
+                    S$<%= Number(trip.budget).toLocaleString() %>
+
+                </strong>
+
+            </p>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h2>Members</h2>
+
+            <p>
+
+                <strong>
+
+                    <%= members.length %>
+
+                </strong>
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Travel Information -->
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card">
+
+            <h2>Travel Dates</h2>
+
+            <p>
+
+                <%= new Date(trip.startDate).toLocaleDateString() %>
+
+                <br><br>
+
+                to
+
+                <br><br>
+
+                <%= new Date(trip.endDate).toLocaleDateString() %>
+
+            </p>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h2>Trip Notes</h2>
+
+            <p>
+
+                <%= trip.notes || "No notes available." %>
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Add Member -->
+     <div class="member-section">
+
+    <h2 class="recent-title">
+
+        Add Member
+
+    </h2>
+
+    <form
+        action="/groupTrip/<%= trip.id %>/addMember"
+        method="POST"
+        class="member-form">
+
+        <div class="form-group">
+
+            <label for="memberName">
+
+                Member Name
+
+            </label>
+
+            <input
+                type="text"
+                id="memberName"
+                name="memberName"
+                placeholder="Enter member name"
+                required>
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="memberEmail">
+
+                Member Email
+
+            </label>
+
+            <input
+                type="email"
+                id="memberEmail"
+                name="memberEmail"
+                placeholder="Enter member email"
+                required>
+
+        </div>
+
+        <button type="submit" class="save-btn">
+
+            Add Member
+
+        </button>
+
+    </form>
+
+</div>
+
+<div class="member-card-section">
+
+    <h2 class="recent-title">
+
+        Members
+
+    </h2>
+
+    <% if(members.length === 0){ %>
+
+        <div class="empty-member">
+
+            <h3>No Members Added</h3>
+
+            <p>
+
+                There are currently no members in this group trip.
+
+            </p>
+
+        </div>
+
+    <% } else { %>
+
+        <div class="member-list">
+
+            <% members.forEach(member => { %>
+
+                <div class="member-item">
+
+                    <div class="member-avatar">
+
+                        <%= member.member_name.charAt(0).toUpperCase() %>
+
+                    </div>
+
+                    <div class="member-info">
+
+                        <h3>
+
+                            <%= member.member_name %>
+
+                        </h3>
+
+                        <p>
+
+                            <%= member.member_email %>
+
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="/groupTrip/<%= trip.id %>/deleteMember/<%= member.id %>"
+                        class="delete-btn"
+                        onclick="return confirm('Remove this member?')">
+
+                        Remove
+
+                    </a>
+
+                </div>
+
+            <% }) %>
+
+        </div>
+
+    <% } %>
+
+</div>
+
+<div class="dashboard-actions">
+
+    <a href="/viewTrips" class="btn">
+
+        Back to Dashboard
+
+    </a>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

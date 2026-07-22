@@ -1,0 +1,125 @@
+<%- include("partials/header") %>
+
+<div class="form-container">
+
+    <h1>Create Group Trip</h1>
+
+    <% if (error.length > 0) { %>
+
+        <div class="error-message">
+            <%= error %>
+        </div>
+
+    <% } %>
+
+    <form action="/addGroupTrip" method="POST" enctype="multipart/form-data">
+
+        <!-- Group Name & Destination -->
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="groupName">Group / Trip Name</label>
+                <input
+                    type="text"
+                    id="groupName"
+                    name="groupName"
+                    placeholder="e.g. RP SOT Shenzhen 2026"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="destination">Destination</label>
+                <input
+                    type="text"
+                    id="destination"
+                    name="destination"
+                    placeholder="Enter destination"
+                    required>
+            </div>
+
+        </div>
+
+        <!-- Country & Budget -->
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input
+                    type="text"
+                    id="country"
+                    name="country"
+                    placeholder="Enter country"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="budget">Budget (SGD)</label>
+                <input
+                    type="number"
+                    id="budget"
+                    name="budget"
+                    placeholder="Enter budget"
+                    required>
+            </div>
+
+        </div>
+
+        <!-- Start Date & End Date -->
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="startDate">Start Date</label>
+                <input
+                    type="date"
+                    id="startDate"
+                    name="startDate"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="endDate">End Date</label>
+                <input
+                    type="date"
+                    id="endDate"
+                    name="endDate"
+                    required>
+            </div>
+
+        </div>
+
+        <!-- Destination Image -->
+        <div class="form-group">
+
+            <label for="image">Destination Image</label>
+
+            <input
+                type="file"
+                id="image"
+                name="image"
+                accept="image/*">
+
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+
+            <label for="notes">Notes</label>
+
+            <textarea
+                id="notes"
+                name="notes"
+                rows="6"
+                placeholder="Additional notes about the group trip"></textarea>
+
+        </div>
+
+        <button type="submit" class="save-btn">
+            Create Group Trip
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

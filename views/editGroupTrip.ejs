@@ -1,0 +1,146 @@
+<%- include("partials/header") %>
+
+<div class="edit-trip-card">
+
+    <h1>Edit Group Trip</h1>
+
+    <form
+        action="/editGroupTrip/<%= trip.id %>"
+        method="POST"
+        enctype="multipart/form-data"
+        class="edit-form">
+
+        <div>
+
+            <label>Group Name</label>
+
+            <input
+                type="text"
+                name="groupName"
+                value="<%= trip.groupName %>"
+                required>
+
+        </div>
+
+        <div>
+
+            <label>Destination</label>
+
+            <input
+                type="text"
+                name="destination"
+                value="<%= trip.destination %>"
+                required>
+
+        </div>
+
+        <div>
+
+            <label>Country</label>
+
+            <input
+                type="text"
+                name="country"
+                value="<%= trip.country %>"
+                required>
+
+        </div>
+
+        <div>
+
+            <label>Start Date</label>
+
+            <input
+                type="date"
+                name="startDate"
+                value="<%= trip.startDate.toISOString().split('T')[0] %>"
+                required>
+
+        </div>
+
+        <div>
+
+            <label>End Date</label>
+
+            <input
+                type="date"
+                name="endDate"
+                value="<%= trip.endDate.toISOString().split('T')[0] %>"
+                required>
+
+        </div>
+
+        <div>
+
+            <label>Budget (SGD)</label>
+
+            <input
+                type="number"
+                name="budget"
+                step="0.01"
+                value="<%= trip.budget %>"
+                required>
+
+        </div>
+
+        <div class="full-width">
+
+            <label>Current Image</label>
+
+            <% if(trip.image){ %>
+
+                <img
+                    src="/images/<%= trip.image %>"
+                    class="edit-trip-image">
+
+            <% } else { %>
+
+                <div class="no-image">
+
+                    No image uploaded
+
+                </div>
+
+            <% } %>
+
+        </div>
+
+        <div class="full-width">
+
+            <label>Upload New Image</label>
+
+            <input
+                type="file"
+                name="image"
+                accept="image/*">
+
+        </div>
+
+        <div class="full-width">
+
+            <label>Notes</label>
+
+            <textarea
+                name="notes"
+                rows="6"><%= trip.notes %></textarea>
+
+        </div>
+
+        <div class="button-center">
+
+            <button
+                type="submit"
+                class="update-btn">
+
+                Update Group Trip
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>
