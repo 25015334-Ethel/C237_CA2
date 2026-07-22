@@ -1136,6 +1136,69 @@ app.get("/groupTrip/:id/deleteMember/:memberId", checkAuthenticated, checkCorpor
 });
 
 // ======================
+// Delete Travel
+// ======================
+app.get("/deleteTravel/:id", checkAuthenticated, (req, res) => {
+
+    const id = req.params.id;
+
+    const sql = `
+        SELECT *
+        FROM trips
+        WHERE id = ?
+        AND user_id = ?
+    `;
+
+    db.query(sql, [id, req.session.user.id], (err, results) => {
+
+        if (err) {
+            console.error(err);
+            return res.send("Database Error");
+        }
+
+        if (results.length === 0) {
+            req.flash("error", "Trip not found.");
+            return res.redirect("/trips");
+        }
+
+        res.render("deleteTravel", {
+            user: req.session.user,
+            trip: results[0],
+            success: req.flash("success"),
+            error: req.flash("error")
+        });
+
+    });
+
+});
+
+// POST route for deletion confirmation
+app.post("/deleteTravel/:id", checkAuthenticated, (req, res) => {
+
+    const id = req.params.id;
+
+    const sql = `
+        DELETE FROM trips
+        WHERE id = ?
+        AND user_id = ?
+    `;
+
+    db.query(sql, [id, req.session.user.id], (err, result) => {
+
+        if (err) {
+            console.error(err);
+            return res.send("Database Error");
+        }
+
+        req.flash("success", "Trip deleted successfully.");
+
+        res.redirect("/trips");
+
+    });
+
+});
+
+// ======================
 // Start Server
 // ======================
 const PORT = process.env.PORT || 3000;
