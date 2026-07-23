@@ -73,6 +73,30 @@ function checkAuthenticated(req, res, next) {
 }
 
 // ======================
+// Admin Role Middleware
+// ======================
+
+function checkAdmin(req, res, next) {
+
+    if (
+        req.session.user &&
+        req.session.user.role === "admin"
+    ) {
+
+        return next();
+
+    }
+
+    req.flash(
+        "error",
+        "Access denied. Admin accounts only."
+    );
+
+    res.redirect("/viewTrips");
+
+}
+
+// ======================
 // Corporate Role Middleware
 // ======================
 function checkCorporate(req, res, next) {
@@ -250,6 +274,244 @@ app.get("/logout", (req, res) => {
     });
 
 });
+
+// =========================================================
+// ADMIN DASHBOARD
+// =========================================================
+
+app.get(
+    "/admin",
+    checkAuthenticated,
+    checkAdmin,
+    (req, res) => {
+
+        const usersSql = `
+
+            SELECT
+                id,
+                username,
+                email,
+                role
+
+            FROM users
+
+            ORDER BY id DESC
+
+        `;
+
+        const tripsSql = `
+
+            SELECT
+
+                trips.*,
+
+                users.username,
+
+                users.email
+
+            FROM trips
+
+            JOIN users
+
+                ON trips.user_id = users.id
+
+            ORDER BY trips.id DESC
+
+        `;
+
+        pool.query(
+            usersSql,
+            (err, users) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.send(
+                        "Database Error"
+                    );
+
+                }
+
+                pool.query(
+                    tripsSql,
+                    (err, trips) => {
+
+                        if (err) {
+
+                            console.error(err);
+
+                            return res.send(
+                                "Database Error"
+                            );
+
+                        }
+
+                        res.render(
+                            "admin",
+                            {
+
+                                user:
+                                    req.session.user,
+
+                                users,
+
+                                trips,
+
+                                success:
+                                    req.flash(
+                                        "success"
+                                    ),
+
+                                error:
+                                    req.flash(
+                                        "error"
+                                    )
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    }
+);
+
+// ======================
+// ADMIN DELETE USER
+// ======================
+
+app.get(
+
+    "/admin/deleteUser/:id",
+
+    checkAuthenticated,
+
+    checkAdmin,
+
+    (req, res) => {
+
+        const userId =
+            req.params.id;
+
+        if (
+            parseInt(userId) ===
+            req.session.user.id
+        ) {
+
+            req.flash(
+
+                "error",
+
+                "You cannot delete your own admin account."
+
+            );
+
+            return res.redirect(
+                "/admin"
+            );
+
+        }
+
+        const sql = `
+
+            DELETE FROM users
+
+            WHERE id = ?
+
+        `;
+
+        pool.query(
+
+            sql,
+
+            [userId],
+
+            (err) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.send(
+                        "Database Error"
+                    );
+
+                }
+
+                req.flash(
+
+                    "success",
+
+                    "User deleted successfully."
+
+                );
+
+                res.redirect(
+                    "/admin"
+                );
+            }
+        );
+    }
+);
+
+// ======================
+// ADMIN DELETE TRIP
+// ======================
+
+app.get(
+
+    "/admin/deleteTrip/:id",
+
+    checkAuthenticated,
+
+    checkAdmin,
+
+    (req, res) => {
+
+        const tripId =
+            req.params.id;
+
+        const sql = `
+
+            DELETE FROM trips
+
+            WHERE id = ?
+
+        `;
+
+        pool.query(
+
+            sql,
+
+            [tripId],
+
+            (err) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.send(
+                        "Database Error"
+                    );
+
+                }
+
+                req.flash(
+
+                    "success",
+
+                    "Trip deleted successfully."
+
+                );
+
+                res.redirect(
+                    "/admin"
+                );
+            }
+        );
+    }
+);
 
 // ======================
 // View Trips Dashboard
