@@ -694,7 +694,7 @@ app.get("/viewTrips", checkAuthenticated, (req, res) => {
 // ======================
 // Add Travel Page
 // ======================
-app.get("/addTrip", checkAuthenticated, (req, res) => {
+app.get("/addTravel", checkAuthenticated, (req, res) => {
 
     res.render("addTravel", {
         user: req.session.user,
