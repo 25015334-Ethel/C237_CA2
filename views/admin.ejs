@@ -1,0 +1,219 @@
+<%- include("partials/header") %>
+
+<div class="container">
+
+    <h1 class="page-title">Admin Dashboard</h1>
+
+    <% if(success.length > 0){ %>
+
+        <div class="success-message">
+            <%= success %>
+        </div>
+
+    <% } %>
+
+    <% if(error.length > 0){ %>
+
+        <div class="error-message">
+            <%= error %>
+        </div>
+
+    <% } %>
+
+
+    <!-- USERS SECTION -->
+
+    <div class="recent-section">
+
+        <div class="section-header">
+
+            <h2>Registered Users</h2>
+
+        </div>
+
+        <% if(users.length === 0){ %>
+
+            <div class="empty-state">
+
+                <h3>No Users Found</h3>
+
+            </div>
+
+        <% } else { %>
+
+            <div class="admin-table-container">
+
+                <table class="admin-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Username</th>
+
+                            <th>Email</th>
+
+                            <th>Role</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <% users.forEach(account => { %>
+
+                            <tr>
+
+                                <td>
+                                    <%= account.id %>
+                                </td>
+
+                                <td>
+                                    <%= account.username %>
+                                </td>
+
+                                <td>
+                                    <%= account.email %>
+                                </td>
+
+                                <td>
+                                    <%= account.role %>
+                                </td>
+
+                                <td>
+
+                                    <% if(account.id !== user.id){ %>
+
+                                        <a
+                                            href="/admin/deleteUser/<%= account.id %>"
+                                            class="btn-small delete-btn"
+                                            onclick="return confirm('Delete this user?')">
+
+                                            Delete
+
+                                        </a>
+
+                                    <% } else { %>
+
+                                        <span>Current Admin</span>
+
+                                    <% } %>
+
+                                </td>
+
+                            </tr>
+
+                        <% }) %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+
+    <!-- ALL TRIPS SECTION -->
+
+    <div class="recent-section">
+
+        <div class="section-header">
+
+            <h2>All User Trips</h2>
+
+        </div>
+
+        <% if(trips.length === 0){ %>
+
+            <div class="empty-state">
+
+                <h3>No Trips Found</h3>
+
+                <p>No users have created any trips yet.</p>
+
+            </div>
+
+        <% } else { %>
+
+            <div class="trip-grid">
+
+                <% trips.forEach(trip => { %>
+
+                    <div class="trip-card">
+
+                        <% if(trip.image){ %>
+
+                            <img
+                                src="/images/<%= trip.image %>"
+                                alt="<%= trip.destination %>"
+                                class="trip-card-image">
+
+                        <% } else { %>
+
+                            <img
+                                src="/images/default.jpg"
+                                alt="No Image"
+                                class="trip-card-image">
+
+                        <% } %>
+
+                        <div class="trip-content">
+
+                            <h3>
+                                <%= trip.destination %>
+                            </h3>
+
+                            <p>
+                                <strong>Country:</strong>
+                                <%= trip.country %>
+                            </p>
+
+                            <p>
+                                <strong>Created By:</strong>
+                                <%= trip.username %>
+                            </p>
+
+                            <p>
+                                <strong>Email:</strong>
+                                <%= trip.email %>
+                            </p>
+
+                            <p>
+                                <strong>Budget:</strong>
+                                S$<%= Number(trip.budget).toLocaleString() %>
+                            </p>
+
+                            <a
+                                href="/admin/deleteTrip/<%= trip.id %>"
+                                class="btn-small delete-btn"
+                                onclick="return confirm('Delete this trip?')">
+
+                                Delete Trip
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                <% }) %>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
