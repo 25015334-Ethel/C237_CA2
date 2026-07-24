@@ -620,8 +620,8 @@ app.get("/viewTrips", checkAuthenticated, (req, res) => {
     // NORMAL USER DASHBOARD
     // ==========================
 
-    const search = req.query.search || "";
-    const country = req.query.country || "";
+    const search = (req.query.search || "").trim();
+    const country = (req.query.country || "").trim();
     const sort = req.query.sort || "";
 
     let sql = `
