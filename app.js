@@ -1041,7 +1041,7 @@ app.get("/deleteTravel/:id", checkAuthenticated, (req, res) => {
 // ----------------------
 // View all group trips
 // ----------------------
-app.get("/groupTrips", checkAuthenticated, checkCorporate, (req, res) => {
+app.get("/viewTrips", checkAuthenticated, checkCorporate, (req, res) => {
 
     const sql = `
         SELECT *
