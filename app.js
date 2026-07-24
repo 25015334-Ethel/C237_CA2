@@ -1228,64 +1228,100 @@ app.get("/editGroupTrip/:id", checkAuthenticated, checkCorporate, (req, res) => 
     });
 
 });
+
+
 // ----------------------
-// Edit group trip - save changes (POST / UPDATE)
+// Edit group trip - save changes
 // ----------------------
-app.post("/editGroupTrip/:id", checkAuthenticated, checkCorporate, (req, res) => {
+app.post(
+    "/editGroupTrip/:id",
+    checkAuthenticated,
+    checkCorporate,
+    upload.single("image"),
+    (req, res) => {
 
-    const id = req.params.id;
+        const id = req.params.id;
 
-    const {
-        groupName,
-        destination,
-        country,
-        startDate,
-        endDate,
-        budget,
-        notes
-    } = req.body;
-
-    const sql = `
-        UPDATE group_trips
-        SET groupName = ?,
-            destination = ?,
-            country = ?,
-            startDate = ?,
-            endDate = ?,
-            budget = ?,
-            notes = ?
-        WHERE id = ?
-        AND corporate_user_id = ?
-    `;
-
-    pool.query(
-        sql,
-        [
+        const {
             groupName,
             destination,
             country,
             startDate,
             endDate,
             budget,
-            notes,
-            id,
-            req.session.user.id
-        ],
-        (err, result) => {
+            notes
+        } = req.body;
+
+        const getTripSql = `
+            SELECT image
+            FROM group_trips
+            WHERE id = ?
+            AND corporate_user_id = ?
+        `;
+
+        pool.query(getTripSql, [id, req.session.user.id], (err, results) => {
 
             if (err) {
                 console.error(err);
                 return res.send("Database Error");
             }
 
-            req.flash("success", "Group trip updated successfully.");
+            if (results.length === 0) {
+                req.flash("error", "Group trip not found.");
+                return res.redirect("/groupTrips");
+            }
 
-            res.redirect("/groupTrips");
+            const image = req.file
+                ? req.file.filename
+                : results[0].image;
 
-        }
-    );
+            const updateSql = `
+                UPDATE group_trips
+                SET
+                    groupName = ?,
+                    destination = ?,
+                    country = ?,
+                    startDate = ?,
+                    endDate = ?,
+                    budget = ?,
+                    notes = ?,
+                    image = ?
+                WHERE id = ?
+                AND corporate_user_id = ?
+            `;
 
-});
+            pool.query(
+                updateSql,
+                [
+                    groupName,
+                    destination,
+                    country,
+                    startDate,
+                    endDate,
+                    budget,
+                    notes,
+                    image,
+                    id,
+                    req.session.user.id
+                ],
+                (err) => {
+
+                    if (err) {
+                        console.error(err);
+                        return res.send("Database Error");
+                    }
+
+                    req.flash("success", "Group trip updated successfully.");
+
+                    res.redirect("/groupTrips");
+
+                }
+            );
+
+        });
+
+    }
+);
 
 // ----------------------
 // Delete group trip (DELETE)
