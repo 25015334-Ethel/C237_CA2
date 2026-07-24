@@ -20,7 +20,6 @@
 
     <% } %>
 
-
     <!-- USERS SECTION -->
 
     <div class="recent-section">
@@ -48,17 +47,11 @@
                     <thead>
 
                         <tr>
-
                             <th>ID</th>
-
                             <th>Username</th>
-
                             <th>Email</th>
-
                             <th>Role</th>
-
                             <th>Action</th>
-
                         </tr>
 
                     </thead>
@@ -69,20 +62,20 @@
 
                             <tr>
 
-                                <td>
-                                    <%= account.id %>
-                                </td>
+                                <td><%= account.id %></td>
+
+                                <td><%= account.username %></td>
+
+                                <td><%= account.email %></td>
 
                                 <td>
-                                    <%= account.username %>
-                                </td>
 
-                                <td>
-                                    <%= account.email %>
-                                </td>
+                                    <span class="role-badge <%= account.role %>">
 
-                                <td>
-                                    <%= account.role %>
+                                        <%= account.role %>
+
+                                    </span>
+
                                 </td>
 
                                 <td>
@@ -100,7 +93,11 @@
 
                                     <% } else { %>
 
-                                        <span>Current Admin</span>
+                                        <span class="current-admin">
+
+                                            Current Admin
+
+                                        </span>
 
                                     <% } %>
 
@@ -119,7 +116,6 @@
         <% } %>
 
     </div>
-
 
     <!-- ALL TRIPS SECTION -->
 
@@ -167,9 +163,7 @@
 
                         <div class="trip-content">
 
-                            <h3>
-                                <%= trip.destination %>
-                            </h3>
+                            <h3><%= trip.destination %></h3>
 
                             <p>
                                 <strong>Country:</strong>
