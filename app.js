@@ -300,9 +300,7 @@ app.get(
                 username,
                 email,
                 role
-
             FROM users
-
             ORDER BY id ASC
 
         `;
