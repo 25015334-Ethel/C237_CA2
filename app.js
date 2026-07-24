@@ -294,117 +294,93 @@ app.get(
     (req, res) => {
 
         const usersSql = `
+
             SELECT
                 id,
                 username,
                 email,
                 role
+
             FROM users
-            ORDER BY id ASC
+
+            ORDER BY id DESC
+
         `;
 
         const tripsSql = `
+
             SELECT
+
                 trips.*,
+
                 users.username,
+
                 users.email
+
             FROM trips
+
             JOIN users
+
                 ON trips.user_id = users.id
-            ORDER BY users.id ASC, trips.id ASC
+
+            ORDER BY trips.id DESC
+
         `;
 
-        const groupTripSql = `
-            SELECT
-                gt.*,
-                u.username,
-                u.email,
-                COUNT(gm.id) AS memberCount
-            FROM group_trips gt
-            JOIN users u
-                ON gt.corporate_user_id = u.id
-            LEFT JOIN group_trip_members gm
-                ON gt.id = gm.group_trip_id
-            GROUP BY
-                gt.id,
-                gt.corporate_user_id,
-                gt.groupName,
-                gt.destination,
-                gt.country,
-                gt.startDate,
-                gt.endDate,
-                gt.budget,
-                gt.notes,
-                gt.created_at,
-                gt.image,
-                u.username,
-                u.email
-            ORDER BY
-                u.id ASC,
-                gt.startDate DESC
-        `;
-
-        pool.query(usersSql, (err, users) => {
-
-            if (err) {
-                console.error(err);
-                return res.send("Database Error");
-            }
-
-            pool.query(tripsSql, (err, trips) => {
+        pool.query(
+            usersSql,
+            (err, users) => {
 
                 if (err) {
+
                     console.error(err);
-                    return res.send("Database Error");
+
+                    return res.send(
+                        "Database Error"
+                    );
+
                 }
 
-                // Group normal user trips by username
-                const groupedTrips = {};
+                pool.query(
+                    tripsSql,
+                    (err, trips) => {
 
-                trips.forEach(trip => {
+                        if (err) {
 
-                    if (!groupedTrips[trip.username]) {
+                            console.error(err);
 
-                        groupedTrips[trip.username] = {
-                            email: trip.email,
-                            trips: []
-                        };
+                            return res.send(
+                                "Database Error"
+                            );
 
+                        }
+
+                        res.render(
+                            "admin",
+                            {
+
+                                user:
+                                    req.session.user,
+
+                                users,
+
+                                trips,
+
+                                success:
+                                    req.flash(
+                                        "success"
+                                    ),
+
+                                error:
+                                    req.flash(
+                                        "error"
+                                    )
+                            }
+                        );
                     }
-
-                    groupedTrips[trip.username].trips.push(trip);
-
-                });
-
-                pool.query(groupTripSql, (err, groupTrips) => {
-
-                    if (err) {
-                        console.error(err);
-                        return res.send("Database Error");
-                    }
-
-                    res.render("admin", {
-
-                        user: req.session.user,
-
-                        users,
-
-                        groupedTrips,
-
-                        groupTrips,
-
-                        success: req.flash("success"),
-
-                        error: req.flash("error")
-
-                    });
-
-                });
-
-            });
-
-        });
-
+                );
+            }
+        );
     }
 );
 
@@ -566,16 +542,13 @@ app.get("/viewTrips", checkAuthenticated, (req, res) => {
         const groupTripSql = `
             SELECT
                 gt.*,
-                u.username,
-                u.email,
                 COUNT(gm.id) AS memberCount
             FROM group_trips gt
-            JOIN users u
-                ON gt.corporate_user_id = u.id
             LEFT JOIN group_trip_members gm
                 ON gt.id = gm.group_trip_id
+            WHERE gt.corporate_user_id = ?
             GROUP BY gt.id
-            ORDER BY u.id ASC, gt.startDate DESC
+            ORDER BY gt.startDate DESC
         `;
 
         pool.query(summarySql, [req.session.user.id], (err, summary) => {
@@ -620,8 +593,8 @@ app.get("/viewTrips", checkAuthenticated, (req, res) => {
     // NORMAL USER DASHBOARD
     // ==========================
 
-    const search = (req.query.search || "").trim();
-    const country = (req.query.country || "").trim();
+    const search = req.query.search || "";
+    const country = req.query.country || "";
     const sort = req.query.sort || "";
 
     let sql = `
@@ -1041,7 +1014,7 @@ app.get("/deleteTravel/:id", checkAuthenticated, (req, res) => {
 // ----------------------
 // View all group trips
 // ----------------------
-app.get("/viewTrips", checkAuthenticated, checkCorporate, (req, res) => {
+app.get("/groupTrips", checkAuthenticated, checkCorporate, (req, res) => {
 
     const sql = `
         SELECT *
@@ -1228,100 +1201,64 @@ app.get("/editGroupTrip/:id", checkAuthenticated, checkCorporate, (req, res) => 
     });
 
 });
-
-
 // ----------------------
-// Edit group trip - save changes
+// Edit group trip - save changes (POST / UPDATE)
 // ----------------------
-app.post(
-    "/editGroupTrip/:id",
-    checkAuthenticated,
-    checkCorporate,
-    upload.single("image"),
-    (req, res) => {
+app.post("/editGroupTrip/:id", checkAuthenticated, checkCorporate, (req, res) => {
 
-        const id = req.params.id;
+    const id = req.params.id;
 
-        const {
+    const {
+        groupName,
+        destination,
+        country,
+        startDate,
+        endDate,
+        budget,
+        notes
+    } = req.body;
+
+    const sql = `
+        UPDATE group_trips
+        SET groupName = ?,
+            destination = ?,
+            country = ?,
+            startDate = ?,
+            endDate = ?,
+            budget = ?,
+            notes = ?
+        WHERE id = ?
+        AND corporate_user_id = ?
+    `;
+
+    pool.query(
+        sql,
+        [
             groupName,
             destination,
             country,
             startDate,
             endDate,
             budget,
-            notes
-        } = req.body;
-
-        const getTripSql = `
-            SELECT image
-            FROM group_trips
-            WHERE id = ?
-            AND corporate_user_id = ?
-        `;
-
-        pool.query(getTripSql, [id, req.session.user.id], (err, results) => {
+            notes,
+            id,
+            req.session.user.id
+        ],
+        (err, result) => {
 
             if (err) {
                 console.error(err);
                 return res.send("Database Error");
             }
 
-            if (results.length === 0) {
-                req.flash("error", "Group trip not found.");
-                return res.redirect("/groupTrips");
-            }
+            req.flash("success", "Group trip updated successfully.");
 
-            const image = req.file
-                ? req.file.filename
-                : results[0].image;
+            res.redirect("/groupTrips");
 
-            const updateSql = `
-                UPDATE group_trips
-                SET
-                    groupName = ?,
-                    destination = ?,
-                    country = ?,
-                    startDate = ?,
-                    endDate = ?,
-                    budget = ?,
-                    notes = ?,
-                    image = ?
-                WHERE id = ?
-                AND corporate_user_id = ?
-            `;
+        }
+    );
 
-            pool.query(
-                updateSql,
-                [
-                    groupName,
-                    destination,
-                    country,
-                    startDate,
-                    endDate,
-                    budget,
-                    notes,
-                    image,
-                    id,
-                    req.session.user.id
-                ],
-                (err) => {
-
-                    if (err) {
-                        console.error(err);
-                        return res.send("Database Error");
-                    }
-
-                    req.flash("success", "Group trip updated successfully.");
-
-                    res.redirect("/groupTrips");
-
-                }
-            );
-
-        });
-
-    }
-);
+});
 
 // ----------------------
 // Delete group trip (DELETE)
