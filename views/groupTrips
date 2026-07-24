@@ -1,0 +1,108 @@
+<%- include("partials/header") %>
+
+<div class="container">
+
+    <h1 class="recent-title">My Group Trips</h1>
+
+    <% if(success.length > 0){ %>
+        <div class="success-message"><%= success %></div>
+    <% } %>
+
+    <% if(error.length > 0){ %>
+        <div class="error-message"><%= error %></div>
+    <% } %>
+
+    <% if(trips.length === 0){ %>
+
+        <div class="dashboard-card">
+            <h2>No Group Trips</h2>
+            <p>You haven't created any group trips yet.</p>
+
+            <a href="/addGroupTrip" class="save-btn">
+                Create Group Trip
+            </a>
+        </div>
+
+    <% } else { %>
+
+        <div class="trip-grid">
+
+            <% trips.forEach(trip => { %>
+
+                <div class="trip-card">
+
+                    <% if(trip.image){ %>
+                        <img
+                            src="/images/<%= trip.image %>"
+                            alt="<%= trip.groupName %>"
+                            class="trip-image">
+                    <% } %>
+
+                    <div class="trip-content">
+
+                        <h2><%= trip.groupName %></h2>
+
+                        <p>
+                            <strong>Destination:</strong>
+                            <%= trip.destination %>, <%= trip.country %>
+                        </p>
+
+                        <p>
+                            <strong>Budget:</strong>
+                            S$<%= Number(trip.budget).toLocaleString() %>
+                        </p>
+
+                        <p>
+                            <strong>Travel:</strong>
+                            <%= new Date(trip.startDate).toLocaleDateString() %>
+                            -
+                            <%= new Date(trip.endDate).toLocaleDateString() %>
+                        </p>
+
+                        <div class="dashboard-actions">
+
+                            <a href="/groupTrip/<%= trip.id %>" class="btn">
+                                View
+                            </a>
+
+                            <a href="/editGroupTrip/<%= trip.id %>" class="btn">
+                                Edit
+                            </a>
+
+                            <a
+                                href="/deleteGroupTrip/<%= trip.id %>"
+                                class="delete-btn"
+                                onclick="return confirm('Delete this group trip?')">
+
+                                Delete
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <% }) %>
+
+        </div>
+
+    <% } %>
+
+    <div class="dashboard-actions">
+
+        <a href="/addGroupTrip" class="save-btn">
+            Add Group Trip
+        </a>
+
+        <a href="/viewTrips" class="btn">
+            Back
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
