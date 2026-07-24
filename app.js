@@ -327,62 +327,48 @@ app.get(
 
         `;
 
-        pool.query(
-            usersSql,
-            (err, users) => {
+        pool.query(usersSql, (err, users) => {
+
+            if (err) {
+                   console.error(err);
+                   return res.send("Database Error");
+            }
+
+            pool.query(tripsSql, (err, trips) => {
 
                 if (err) {
-
                     console.error(err);
+                    return res.send("Database Error");
+            }
 
-                    return res.send(
-                        "Database Error"
-                    );
+            pool.query(groupTripSql, (err, groupTrips) => {
 
+                if (err) {
+                    console.error(err);
+                    return res.send("Database Error");
                 }
 
-                pool.query(
-                    tripsSql,
-                    (err, trips) => {
+                res.render("admin", {
 
-                        if (err) {
+                    user: req.session.user,
 
-                            console.error(err);
+                    users,
 
-                            return res.send(
-                                "Database Error"
-                            );
+                    trips,
 
-                        }
+                    groupTrips,
 
-                        res.render(
-                            "admin",
-                            {
+                    success: req.flash("success"),
 
-                                user:
-                                    req.session.user,
+                    error: req.flash("error")
 
-                                users,
+                });
 
-                                trips,
+            });
 
-                                success:
-                                    req.flash(
-                                        "success"
-                                    ),
+        });
 
-                                error:
-                                    req.flash(
-                                        "error"
-                                    )
-                            }
-                        );
-                    }
-                );
-            }
-        );
-    }
-);
+    });
 
 // ======================
 // ADMIN DELETE USER
