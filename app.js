@@ -325,8 +325,23 @@ app.get(
                 ON gt.corporate_user_id = u.id
             LEFT JOIN group_trip_members gm
                 ON gt.id = gm.group_trip_id
-            GROUP BY gt.id
-            ORDER BY u.id ASC, gt.startDate DESC
+            GROUP BY
+                gt.id,
+                gt.corporate_user_id,
+                gt.groupName,
+                gt.destination,
+                gt.country,
+                gt.startDate,
+                gt.endDate,
+                gt.budget,
+                gt.notes,
+                gt.created_at,
+                gt.image,
+                u.username,
+                u.email
+            ORDER BY
+                u.id ASC,
+                gt.startDate DESC
         `;
 
         pool.query(usersSql, (err, users) => {
