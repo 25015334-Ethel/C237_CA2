@@ -5,19 +5,15 @@
     <h1 class="page-title">Admin Dashboard</h1>
 
     <% if(success.length > 0){ %>
-
         <div class="success-message">
             <%= success %>
         </div>
-
     <% } %>
 
     <% if(error.length > 0){ %>
-
         <div class="error-message">
             <%= error %>
         </div>
-
     <% } %>
 
     <!-- USERS SECTION -->
@@ -25,17 +21,13 @@
     <div class="recent-section">
 
         <div class="section-header">
-
             <h2>Registered Users</h2>
-
         </div>
 
         <% if(users.length === 0){ %>
 
             <div class="empty-state">
-
                 <h3>No Users Found</h3>
-
             </div>
 
         <% } else { %>
@@ -45,7 +37,6 @@
                 <table class="admin-table">
 
                     <thead>
-
                         <tr>
                             <th>ID</th>
                             <th>Username</th>
@@ -53,7 +44,6 @@
                             <th>Role</th>
                             <th>Action</th>
                         </tr>
-
                     </thead>
 
                     <tbody>
@@ -71,9 +61,7 @@
                                 <td>
 
                                     <span class="role-badge <%= account.role %>">
-
                                         <%= account.role %>
-
                                     </span>
 
                                 </td>
@@ -94,9 +82,7 @@
                                     <% } else { %>
 
                                         <span class="current-admin">
-
                                             Current Admin
-
                                         </span>
 
                                     <% } %>
@@ -117,90 +103,197 @@
 
     </div>
 
-    <!-- ALL TRIPS SECTION -->
+    <!-- ALL USER TRIPS -->
 
     <div class="recent-section">
 
         <div class="section-header">
-
             <h2>All User Trips</h2>
-
         </div>
 
-        <% if(trips.length === 0){ %>
+        <% if(Object.keys(groupedTrips).length === 0){ %>
 
             <div class="empty-state">
-
                 <h3>No Trips Found</h3>
-
                 <p>No users have created any trips yet.</p>
-
             </div>
 
         <% } else { %>
 
-            <div class="trip-grid">
+            <% Object.keys(groupedTrips).forEach(username => { %>
 
-                <% trips.forEach(trip => { %>
+                <div class="user-trip-section">
 
-                    <div class="trip-card">
+                    <h3 class="user-heading">
+                        <%= username %>
+                        <span class="user-email">
+                            (<%= groupedTrips[username].email %>)
+                        </span>
+                    </h3>
 
-                        <% if(trip.image){ %>
+                    <div class="trip-grid">
 
-                            <img
-                                src="/images/<%= trip.image %>"
-                                alt="<%= trip.destination %>"
-                                class="trip-card-image">
+                        <% groupedTrips[username].trips.forEach(trip => { %>
 
-                        <% } else { %>
+                            <div class="trip-card">
 
-                            <img
-                                src="/images/default.jpg"
-                                alt="No Image"
-                                class="trip-card-image">
+                                <% if(trip.image){ %>
 
-                        <% } %>
+                                    <img
+                                        src="/images/<%= trip.image %>"
+                                        alt="<%= trip.destination %>"
+                                        class="trip-card-image">
 
-                        <div class="trip-content">
+                                <% } else { %>
 
-                            <h3><%= trip.destination %></h3>
+                                    <img
+                                        src="/images/default.jpg"
+                                        alt="No Image"
+                                        class="trip-card-image">
 
-                            <p>
-                                <strong>Country:</strong>
-                                <%= trip.country %>
-                            </p>
+                                <% } %>
 
-                            <p>
-                                <strong>Created By:</strong>
-                                <%= trip.username %>
-                            </p>
+                                <div class="trip-content">
 
-                            <p>
-                                <strong>Email:</strong>
-                                <%= trip.email %>
-                            </p>
+                                    <h3><%= trip.destination %></h3>
 
-                            <p>
-                                <strong>Budget:</strong>
-                                S$<%= Number(trip.budget).toLocaleString() %>
-                            </p>
+                                    <p>
+                                        <strong>Country:</strong>
+                                        <%= trip.country %>
+                                    </p>
 
-                            <a
-                                href="/admin/deleteTrip/<%= trip.id %>"
-                                class="btn-small delete-btn"
-                                onclick="return confirm('Delete this trip?')">
+                                    <p>
+                                        <strong>Budget:</strong>
+                                        S$<%= Number(trip.budget).toLocaleString() %>
+                                    </p>
 
-                                Delete Trip
+                                    <% if(trip.notes){ %>
+                                        <p>
+                                            <strong>Notes:</strong>
+                                            <%= trip.notes %>
+                                        </p>
+                                    <% } %>
 
-                            </a>
+                                    <a
+                                        href="/admin/deleteTrip/<%= trip.id %>"
+                                        class="btn-small delete-btn"
+                                        onclick="return confirm('Delete this trip?')">
 
-                        </div>
+                                        Delete Trip
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        <% }) %>
 
                     </div>
 
-                <% }) %>
+                </div>
 
+            <% }) %>
+
+        <% } %>
+
+    </div>
+
+    <!-- CORPORATE GROUP TRIPS -->
+
+    <div class="recent-section">
+
+        <div class="section-header">
+            <h2>Corporate Group Trips</h2>
+        </div>
+
+        <% if(groupTrips.length === 0){ %>
+
+            <div class="empty-state">
+                <h3>No Corporate Group Trips Found</h3>
+                <p>No corporate users have created any group trips yet.</p>
             </div>
+
+        <% } else { %>
+
+            <% groupTrips.forEach(trip => { %>
+
+                <div class="trip-card">
+
+                    <% if(trip.image){ %>
+
+                        <img
+                            src="/images/<%= trip.image %>"
+                            alt="<%= trip.groupName %>"
+                            class="trip-card-image">
+
+                    <% } else { %>
+
+                        <img
+                            src="/images/default.jpg"
+                            alt="No Image"
+                            class="trip-card-image">
+
+                    <% } %>
+
+                    <div class="trip-content">
+
+                        <h3><%= trip.groupName %></h3>
+
+                        <p>
+                            <strong>Destination:</strong>
+                            <%= trip.destination %>
+                        </p>
+
+                        <p>
+                            <strong>Country:</strong>
+                            <%= trip.country %>
+                        </p>
+
+                        <p>
+                            <strong>Corporate Account:</strong>
+                            <%= trip.username %>
+                        </p>
+
+                        <p>
+                            <strong>Email:</strong>
+                            <%= trip.email %>
+                        </p>
+
+                        <p>
+                            <strong>Members:</strong>
+                            <%= trip.memberCount %>
+                        </p>
+
+                        <p>
+                            <strong>Budget:</strong>
+                            S$<%= Number(trip.budget).toLocaleString() %>
+                        </p>
+
+                        <% if(trip.notes){ %>
+
+                            <p>
+                                <strong>Notes:</strong>
+                                <%= trip.notes %>
+                            </p>
+
+                        <% } %>
+
+                        <p>
+                            <strong>Start:</strong>
+                            <%= new Date(trip.startDate).toLocaleDateString() %>
+                        </p>
+
+                        <p>
+                            <strong>End:</strong>
+                            <%= new Date(trip.endDate).toLocaleDateString() %>
+                        </p>
+
+                    </div>
+
+                </div>
+
+            <% }) %>
 
         <% } %>
 
