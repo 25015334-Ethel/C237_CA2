@@ -1057,7 +1057,7 @@ app.get("/groupTrips", checkAuthenticated, checkCorporate, (req, res) => {
             return res.send("Database Error");
         }
 
-        res.render("groupTrip", {
+        res.render("groupTrips", {
             user: req.session.user,
             trips: results,
             success: req.flash("success"),
