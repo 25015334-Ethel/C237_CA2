@@ -303,7 +303,7 @@ app.get(
 
             FROM users
 
-            ORDER BY id DESC
+            ORDER BY id ASC
 
         `;
 
