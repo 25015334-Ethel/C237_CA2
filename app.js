@@ -92,7 +92,7 @@ function checkAdmin(req, res, next) {
         "Access denied. Admin accounts only."
     );
 
-    res.redirect("/viewTrips");
+    return res.redirect("/viewTrips");
 
 }
 
@@ -252,7 +252,15 @@ app.post("/login", (req, res) => {
 
         req.flash("success", "Welcome back!");
 
-        res.redirect("/viewTrips");
+        if (req.session.user.role === "admin") {
+            return res.redirect("/admin");
+        }
+
+        if (req.session.user.role === "corporate") {
+            return res.redirect("/viewTrips");
+        }
+
+        return res.redirect("/viewTrips");
 
     });
 
