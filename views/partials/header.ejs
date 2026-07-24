@@ -45,20 +45,33 @@
 
             <% } else { %>
 
-                <li>
-                    <a href="/viewTrips">Dashboard</a>
-                </li>
-
-                <li>
-                    <a href="/addTravel">
-                        <%= user.role === "corporate" ? "Business Travel" : "Add Travel" %>
-                    </a>
-                </li>
-
-                <% if(user.role === "corporate"){ %>
+                <!-- Admin -->
+                <% if(user.role === "admin"){ %>
 
                     <li>
-                        <a href="/addGroupTrip">Group Trips</a>
+                        <a href="/admin">Dashboard</a>
+                    </li>
+
+                <!-- Corporate -->
+                <% } else if(user.role === "corporate"){ %>
+
+                    <li>
+                        <a href="/viewTrips">Dashboard</a>
+                    </li>
+
+                    <li>
+                        <a href="/addGroupTrip">Add Group Trip</a>
+                    </li>
+
+                <!-- Normal User -->
+                <% } else { %>
+
+                    <li>
+                        <a href="/viewTrips">Dashboard</a>
+                    </li>
+
+                    <li>
+                        <a href="/addTravel">Add Travel</a>
                     </li>
 
                 <% } %>
