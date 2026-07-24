@@ -294,44 +294,46 @@ app.get(
     (req, res) => {
 
         const usersSql = `
-
             SELECT
                 id,
                 username,
                 email,
                 role
-
             FROM users
-
-            ORDER BY users.id ASC
-
+            ORDER BY id ASC
         `;
 
         const tripsSql = `
-
             SELECT
-
                 trips.*,
-
                 users.username,
-
                 users.email
-
             FROM trips
-
             JOIN users
-
                 ON trips.user_id = users.id
+            ORDER BY users.id ASC, trips.id ASC
+        `;
 
-            ORDER BY trips.id DESC
-
+        const groupTripSql = `
+            SELECT
+                gt.*,
+                u.username,
+                u.email,
+                COUNT(gm.id) AS memberCount
+            FROM group_trips gt
+            JOIN users u
+                ON gt.corporate_user_id = u.id
+            LEFT JOIN group_trip_members gm
+                ON gt.id = gm.group_trip_id
+            GROUP BY gt.id
+            ORDER BY u.id ASC, gt.startDate DESC
         `;
 
         pool.query(usersSql, (err, users) => {
 
             if (err) {
-                   console.error(err);
-                   return res.send("Database Error");
+                console.error(err);
+                return res.send("Database Error");
             }
 
             pool.query(tripsSql, (err, trips) => {
@@ -339,28 +341,48 @@ app.get(
                 if (err) {
                     console.error(err);
                     return res.send("Database Error");
-            }
-
-            pool.query(groupTripSql, (err, groupTrips) => {
-
-                if (err) {
-                    console.error(err);
-                    return res.send("Database Error");
                 }
 
-                res.render("admin", {
+                // Group normal user trips by username
+                const groupedTrips = {};
 
-                    user: req.session.user,
+                trips.forEach(trip => {
 
-                    users,
+                    if (!groupedTrips[trip.username]) {
 
-                    trips,
+                        groupedTrips[trip.username] = {
+                            email: trip.email,
+                            trips: []
+                        };
 
-                    groupTrips,
+                    }
 
-                    success: req.flash("success"),
+                    groupedTrips[trip.username].trips.push(trip);
 
-                    error: req.flash("error")
+                });
+
+                pool.query(groupTripSql, (err, groupTrips) => {
+
+                    if (err) {
+                        console.error(err);
+                        return res.send("Database Error");
+                    }
+
+                    res.render("admin", {
+
+                        user: req.session.user,
+
+                        users,
+
+                        groupedTrips,
+
+                        groupTrips,
+
+                        success: req.flash("success"),
+
+                        error: req.flash("error")
+
+                    });
 
                 });
 
@@ -368,7 +390,8 @@ app.get(
 
         });
 
-    });
+    }
+);
 
 // ======================
 // ADMIN DELETE USER
@@ -528,13 +551,16 @@ app.get("/viewTrips", checkAuthenticated, (req, res) => {
         const groupTripSql = `
             SELECT
                 gt.*,
+                u.username,
+                u.email,
                 COUNT(gm.id) AS memberCount
             FROM group_trips gt
+            JOIN users u
+                ON gt.corporate_user_id = u.id
             LEFT JOIN group_trip_members gm
                 ON gt.id = gm.group_trip_id
-            WHERE gt.corporate_user_id = ?
             GROUP BY gt.id
-            ORDER BY gt.startDate DESC
+            ORDER BY u.id ASC, gt.startDate DESC
         `;
 
         pool.query(summarySql, [req.session.user.id], (err, summary) => {
